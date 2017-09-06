@@ -20,6 +20,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/twhiston/pb/pb"
 	"io/ioutil"
+	"log"
+	"os"
 	"os/user"
 	"time"
 )
@@ -38,10 +40,8 @@ var genCmd = &cobra.Command{
 		if isBare == true {
 			return handleBareBuild(args)
 		}
-
 		//If its not a bare build we go into 'interactive console' mode and ask a load of questions
-
-		return nil
+		return handleInteractiveBuild()
 	},
 }
 
@@ -56,9 +56,104 @@ func handleBareBuild(args []string) error {
 	}
 
 	//Render the template to a buffer and write it to a file
+	return renderSchemaToCwd(config)
+}
+
+func renderSchemaToCwd(config *pb.Config) error {
 	buf := bytes.NewBuffer(*new([]byte))
 	renderSchemaTemplate(buf, config)
 	return ioutil.WriteFile(config.Name+".yml", buf.Bytes(), 0644)
+}
+
+type question struct {
+	Question string
+	Storage  *string
+	Default  string
+}
+
+func handleInteractiveBuild() error {
+
+	config := new(pb.Config)
+
+	err := addHeaderConfig(config)
+	if err != nil {
+		return err
+	}
+
+	//TODO - too verbose
+	qs := []question{
+		{"Name", &config.Name, ""},
+		{"Category", &config.Category, "Effect"},
+		{"Info", &config.Info, "Editor tooltip text"},
+		{"Help", &config.Help, "Shown in the help window of the editor"},
+		{"Path to .c file", &config.Code.Path, "./patchblock.c"},
+	}
+
+	for _, v := range qs {
+		err = getSimpleQuestion(&v)
+		if err != nil {
+			return err
+		}
+	}
+
+	//TODO - Now deal with input/output/vars
+
+	for {
+		ai, err := getInput("Add Input (y/N)", "N", os.Stdin)
+		if ai != "y" && ai != "Y" {
+			break
+		}
+		//Input - info value editable
+		inp := new(pb.Input)
+		iqs := []question{
+			{"Info", &inp.Info, "Tooltip Text"},
+			{"Value", &inp.Value, "0"},
+			//TODO - Editable
+			//{"Editable", &input.Editable, "Tooltip Text"},
+		}
+
+		for _, v := range iqs {
+			err = getSimpleQuestion(&v)
+			if err != nil {
+				return err
+			}
+		}
+		config.Inputs = append(config.Inputs, *inp)
+	}
+
+	for {
+		ai, err := getInput("Add Output (y/N)", "N", os.Stdin)
+		if ai != "y" && ai != "Y" {
+			break
+		}
+		//Input - info value editable
+		out := new(pb.Output)
+		iqs := []question{
+			{"Info", &out.Info, "Tooltip Text"},
+			//TODO - Does output actually need an initial value? does it work? does anyone care?
+			//{"Value", &out.Value, "0"},
+		}
+
+		for _, v := range iqs {
+			err = getSimpleQuestion(&v)
+			if err != nil {
+				return err
+			}
+		}
+		config.Outputs = append(config.Outputs, *out)
+	}
+
+	return renderSchemaToCwd(config)
+}
+
+func getSimpleQuestion(q *question) error {
+
+	str, err := getInput(q.Question, q.Default, os.Stdin)
+	if err != nil {
+		return err
+	}
+	*q.Storage = str
+	return nil
 }
 
 func makeBareConfigData(args []string) (*pb.Config, error) {
@@ -68,15 +163,10 @@ func makeBareConfigData(args []string) (*pb.Config, error) {
 	config.Name = string(args[0])
 
 	//Current User
-	usr, err := user.Current()
+	err := addHeaderConfig(config)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
-	config.Username = usr.Username
-
-	//Time
-	t := time.Now()
-	config.DateNow = t.Format("Mon 22 Jan 2006 15:04:05")
 
 	//We actually want to add 1 element for input, output and var for example, but we just add blank strings
 	config.Inputs = make([]pb.Input, 1)
@@ -87,6 +177,20 @@ func makeBareConfigData(args []string) (*pb.Config, error) {
 	config.Code.Path = "	# full path to the .c file you wish to parse into the block definition on render. If path is blank and no block tries cwd"
 
 	return config, nil
+}
+
+func addHeaderConfig(config *pb.Config) error {
+	//Current User
+	usr, err := user.Current()
+	if err != nil {
+		return err
+	}
+	config.Username = usr.Username
+
+	//Time
+	t := time.Now()
+	config.DateNow = t.Format("Mon 22 Jan 2006 15:04:05")
+	return nil
 }
 
 func init() {

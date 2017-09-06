@@ -104,7 +104,7 @@ func tplSchemaYmlTpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "tpl/schema.yml.tpl", size: 904, mode: os.FileMode(420), modTime: time.Unix(1504560508, 0)}
+	info := bindataFileInfo{name: "tpl/schema.yml.tpl", size: 904, mode: os.FileMode(420), modTime: time.Unix(1504731659, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
