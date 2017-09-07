@@ -1,27 +1,26 @@
-<block name="{{ .name }}">
-    <category>{{ .category }}</category>
-    <info>{{ .info }}</info>
-    <data name="{{ .blockNameLower }}">
-    {{ range $key, $value := .inputs }}
-        <variable socket="in" info="Signal input" />
-        <variable socket="in" editable="1" value="100" info="Delay time in ms" />
-    {{ end }}
-    {{ range $key, $value := .outputs }}
-        <variable socket="out" info="$value" />
-    {{ end }}
-    {{ range $key, $value := .vars }}
-        <variable dtype="{{ $value.type }}" name="{{ $value.name }}" />
-        //OR IF VALUE ADD value="0"
-    {{ end }}
+<block name="{{ .Name }}">
+    <category>{{ .Category }}</category>
+    <info>{{ .Info }}</info>
+    <data name="{{ .BlockNameLower }}">
+    {{- range $key, $value := .Inputs }}
+        <variable socket="in" {{ if eq $value.Editable "1" }}editable="{{ $value.Editable }}" {{ end }}{{ if ne $value.Value "0" }}value="{{ $value.Value }}" {{ end }}info="{{ $value.Info }}" />
+    {{- end -}}
+    {{- range $key, $value := .Outputs }}
+        <variable socket="out" info="{{ $value.Info }}" />
+    {{- end -}}
+    {{- range $key, $value := .Vars }}
+        <variable dtype="{{ $value.Dtype }}" name="{{ $value.Name }}" {{ if ne $value.Value "" }}value="{{ $value.Value }}" {{ end }}/>
+    {{- end }}
     </data>
-    <function name="f_{{ .blockNameLower }}">
+    <function name="f_{{ .BlockNameLower }}">
         <![CDATA[
-    {{ .function }}
-	]]>
+{{- range $key, $value := .ParsedFunction -}}
+{{ $value }}
+{{ end }}	]]>
     </function>
     <help>
         <![CDATA[
-{{ .help }}
+{{ .Help }}
 	]]>
     </help>
 </block>

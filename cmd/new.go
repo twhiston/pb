@@ -1,4 +1,4 @@
-// Copyright © 2017 NAME HERE <EMAIL ADDRESS>
+// Copyright © 2017 Tom Whiston <tom.whiston@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import (
 	"log"
 	"os"
 	"os/user"
-	"strings"
 	"time"
 )
 
@@ -31,7 +30,13 @@ import (
 var genCmd = &cobra.Command{
 	Use:   "new",
 	Short: "Generates a patchblock project skeleton",
-	Long:  ``,
+	Long: `The new command will generate a new patchblock project skeleton.
+This consists of:
+ patchblock_name.yml 	- A yml file comprised of all the field data and information about your patchblock.
+ 					  	  Blocks of text should be surrounded by backticks
+ patchblock_name.c		- A valid C file where you can write your patch code.
+ 						  This differst slighly from a standard patchblock function CDATA as it contains the function signature.
+ 						  This is so that later we can add a testing framework`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Bare repos get a simple build
 		isBare, err := cmd.PersistentFlags().GetBool("bare")
@@ -100,6 +105,7 @@ func renderCToConfigCodePath(config *pb.Config) error {
 	return ioutil.WriteFile(config.Code.Path, buf.Bytes(), 0644)
 }
 
+// question is a helper struct to pack a name, output reference and default value together
 type question struct {
 	Question string
 	Storage  *string
@@ -120,7 +126,6 @@ func handleInteractiveBuild() error {
 		{"Category", &config.Category, "Effect"},
 		{"Info", &config.Info, "Editor tooltip text"},
 		{"Help", &config.Help, "Shown in the help window of the editor"},
-		//{"Path to .c file", &config.Code.Path, "./patchblock.c"},
 	}
 
 	for _, v := range qs {
@@ -130,8 +135,7 @@ func handleInteractiveBuild() error {
 		}
 	}
 	//Sanitize name input
-	config.Name = strings.ToLower(config.Name)
-	config.Name = strings.Replace(config.Name, " ", "_", -1)
+	config.Name = sanitizeStringInput(config.Name)
 
 	// LOOP FOR INPUTS
 	for {
@@ -151,8 +155,6 @@ func handleInteractiveBuild() error {
 		iqs := []question{
 			{"Info", &inp.Info, "Tooltip Text"},
 			{"Value", &inp.Value, "0"},
-			//TODO - Editable
-			//{"Editable", &input.Editable, "Tooltip Text"},
 		}
 
 		for _, v := range iqs {
@@ -161,6 +163,20 @@ func handleInteractiveBuild() error {
 				return err
 			}
 		}
+
+		for {
+			eq := question{"Editable (y/N)", &inp.Editable, "n"}
+			getSimpleQuestion(&eq)
+			// This is a bit :(
+			if inp.Editable == "y" || inp.Editable == "Y" {
+				inp.Editable = "1"
+				break
+			} else if inp.Editable == "n" || inp.Editable == "N" {
+				inp.Editable = "0"
+				break
+			}
+		}
+
 		config.Inputs = append(config.Inputs, *inp)
 	}
 

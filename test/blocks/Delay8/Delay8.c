@@ -20,5 +20,4 @@ static inline void i2o1_delay8(i2o1 *data){
 	data->data[data->index] = *data->in0 >> 2; // bit reduction
 	data->out0 = data->data[smp] << 2;
 	data->index++;
-
 }

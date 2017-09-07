@@ -21,9 +21,8 @@
 {{- end -}}
 {{- end }}
  */
+static inline void i{{ len .Inputs }}o{{ len .Outputs }}_{{ .Name }}(i{{ len .Inputs }}o{{ len .Outputs }} *data){
 
- static inline void i{{ len .Inputs }}o{{ len .Outputs }}_{{ .Name }}(i{{ len .Inputs }}o{{ len .Outputs }} *data){
+    /* Implement the special sauce here */
 
-    /* My Awesome Function */
-
- }
+}

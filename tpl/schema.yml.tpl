@@ -13,22 +13,22 @@ inputs:
   - info: {{ $value.Info }}
     value: {{ $value.Value }}
     editable: {{ $value.Editable }}
-{{ end -}}
-{{ end -}}
-{{ if .Outputs -}}
+{{- end -}}
+{{- end -}}
+{{ if .Outputs }}
 outputs:
 {{- range $key, $value := .Outputs }}
   - info: {{ $value.Info }}
     value: {{ $value.Value }}
-{{ end -}}
-{{ end -}}
-{{ if .Vars -}}
+{{- end -}}
+{{- end -}}
+{{ if .Vars }}
 vars:
 {{- range $key, $value := .Vars }}
   - dtype: {{ $value.Dtype }}
     name: {{ $value.Name }}
-{{ end -}}
-{{ end -}}
+{{- end -}}
+{{- end }}
 help: {{ .Help }}
 code:
 {{- with .Code }}
