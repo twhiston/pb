@@ -126,11 +126,8 @@ var renderCmd = &cobra.Command{
 		// or should we just try to find it in a file somewhere? that is more error prone imo
 
 		//Render the template
-		for _, v := range code {
-			log.Println(v)
-		}
-
 		cfg.InternalTemplateData.ParsedFunction = code
+		cfg.Help = strings.TrimSpace(cfg.Help)
 
 		buf := bytes.NewBuffer(*new([]byte))
 
@@ -219,6 +216,9 @@ var confCmd = &cobra.Command{
 				i := new(pb.Input)
 				i.Info = v.Info
 				i.Editable = v.Editable
+				if v.Value == "" {
+					v.Value = "0"
+				}
 				i.Value = v.Value
 				pbConf.Inputs = append(pbConf.Inputs, *i)
 			} else if v.Socket == "out" {

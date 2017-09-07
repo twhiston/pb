@@ -11,15 +11,15 @@ info: {{ .Info }}
 inputs:
 {{- range $key, $value := .Inputs }}
   - info: {{ $value.Info }}
-    value: {{ $value.Value }}
-    editable: {{ $value.Editable }}
+    {{ if $value.Value }}value: {{ $value.Value }}{{ end }}
+    {{ if $value.Editable }}editable: {{ $value.Editable }}{{ end }}
 {{- end -}}
 {{- end -}}
 {{ if .Outputs }}
 outputs:
 {{- range $key, $value := .Outputs }}
   - info: {{ $value.Info }}
-    value: {{ $value.Value }}
+    {{ if $value.Value }}value: {{ $value.Value }}{{ end }}
 {{- end -}}
 {{- end -}}
 {{ if .Vars }}
@@ -27,12 +27,12 @@ vars:
 {{- range $key, $value := .Vars }}
   - dtype: {{ $value.Dtype }}
     name: {{ $value.Name }}
+    {{ if $value.Value }}value: {{ $value.Value }}{{ end }}
 {{- end -}}
 {{- end }}
-help: `{{ .Help }}`
+help: >
+    {{ .Help }}
 code:
-{{- with .Code }}
-{{- if .Path }}
-  path: {{ .Path }}
+{{- if .Code.Path }}
+  path: {{ .Code.Path }}
 {{- end }}
-{{ end }}
