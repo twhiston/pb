@@ -11,7 +11,6 @@ Patchblocks CLI helper tool for developing new blocks
 
 ## Roadmap
 
-- Testing that converts to <-> from all internal blocks to ensure parity
 - Render time expansion of common patchblock operation macros
 - Docker container for testing project golang and C files in CI
 - Test framework
