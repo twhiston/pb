@@ -23,6 +23,7 @@ import (
 	"log"
 	"os"
 	"os/user"
+	"strings"
 	"time"
 )
 
@@ -55,14 +56,48 @@ func handleBareBuild(args []string) error {
 		return err
 	}
 
-	//Render the template to a buffer and write it to a file
-	return renderSchemaToCwd(config)
+	return doRenderFromConfig(config)
+}
+
+func makeBareConfigData(args []string) (*pb.Config, error) {
+	//Make a config object
+	config := new(pb.Config)
+
+	config.Name = string(args[0])
+
+	//Current User
+	err := addHeaderConfig(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//We actually want to add 1 element for input, output and var for example, but we just add blank strings
+	config.Inputs = make([]pb.Input, 1)
+	config.Outputs = make([]pb.Output, 1)
+	config.Vars = make([]pb.Var, 1)
+
+	config.Code.Block = "	# enclose a block of code in backticks for multi line compatibility"
+	config.Code.Path = "	# full path to the .c file you wish to parse into the block definition on render. If path is blank and no block tries cwd"
+
+	return config, nil
 }
 
 func renderSchemaToCwd(config *pb.Config) error {
 	buf := bytes.NewBuffer(*new([]byte))
-	renderSchemaTemplate(buf, config)
+	err := renderSchemaTemplate(buf, config)
+	if err != nil {
+		return err
+	}
 	return ioutil.WriteFile(config.Name+".yml", buf.Bytes(), 0644)
+}
+
+func renderCToConfigCodePath(config *pb.Config) error {
+	buf := bytes.NewBuffer(*new([]byte))
+	err := renderCTemplate(buf, config)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(config.Code.Path, buf.Bytes(), 0644)
 }
 
 type question struct {
@@ -80,13 +115,12 @@ func handleInteractiveBuild() error {
 		return err
 	}
 
-	//TODO - too verbose
 	qs := []question{
 		{"Name", &config.Name, ""},
 		{"Category", &config.Category, "Effect"},
 		{"Info", &config.Info, "Editor tooltip text"},
 		{"Help", &config.Help, "Shown in the help window of the editor"},
-		{"Path to .c file", &config.Code.Path, "./patchblock.c"},
+		//{"Path to .c file", &config.Code.Path, "./patchblock.c"},
 	}
 
 	for _, v := range qs {
@@ -95,13 +129,22 @@ func handleInteractiveBuild() error {
 			return err
 		}
 	}
+	//Sanitize name input
+	config.Name = strings.ToLower(config.Name)
+	config.Name = strings.Replace(config.Name, " ", "_", -1)
 
-	//TODO - Now deal with input/output/vars
-
+	// LOOP FOR INPUTS
 	for {
+		if len(config.Inputs) >= 4 {
+			log.Println("Cannot have more than 4 input")
+			break
+		}
 		ai, err := getInput("Add Input (y/N)", "N", os.Stdin)
 		if ai != "y" && ai != "Y" {
-			break
+			if len(config.Inputs) > 0 {
+				break
+			}
+			log.Println("Must have at least 1 input")
 		}
 		//Input - info value editable
 		inp := new(pb.Input)
@@ -121,10 +164,18 @@ func handleInteractiveBuild() error {
 		config.Inputs = append(config.Inputs, *inp)
 	}
 
+	// LOOP FOR OUTPUTS
 	for {
+		if len(config.Outputs) >= 4 {
+			log.Println("Cannot have more than 4 outputs")
+			break
+		}
 		ai, err := getInput("Add Output (y/N)", "N", os.Stdin)
 		if ai != "y" && ai != "Y" {
-			break
+			if len(config.Outputs) > 0 {
+				break
+			}
+			log.Println("Must have at least 1 output")
 		}
 		//Input - info value editable
 		out := new(pb.Output)
@@ -134,6 +185,7 @@ func handleInteractiveBuild() error {
 			//{"Value", &out.Value, "0"},
 		}
 
+		out.Value = "0"
 		for _, v := range iqs {
 			err = getSimpleQuestion(&v)
 			if err != nil {
@@ -143,7 +195,45 @@ func handleInteractiveBuild() error {
 		config.Outputs = append(config.Outputs, *out)
 	}
 
-	return renderSchemaToCwd(config)
+	// LOOP FOR VARS
+	for {
+		ai, err := getInput("Add Var (y/N)", "N", os.Stdin)
+		if ai != "y" && ai != "Y" {
+			break
+		}
+		//Input - info value editable
+		varg := new(pb.Var)
+		iqs := []question{
+			{"Info", &varg.Info, "Tooltip Text"},
+			{"Value", &varg.Value, "0"},
+			{"dtype", &varg.Dtype, "int32_t"},
+			{"name", &varg.Name, "buffer[23]"},
+		}
+
+		for _, v := range iqs {
+			err = getSimpleQuestion(&v)
+			if err != nil {
+				return err
+			}
+		}
+		config.Vars = append(config.Vars, *varg)
+	}
+
+	config.Code = pb.Code{Path: "./" + config.Name + ".c"}
+
+	return doRenderFromConfig(config)
+}
+
+func doRenderFromConfig(c *pb.Config) error {
+
+	log.Println("Rendering C File")
+	err := renderCToConfigCodePath(c)
+	if err != nil {
+		return err
+	}
+	log.Println("Rendering Schema File")
+	return renderSchemaToCwd(c)
+
 }
 
 func getSimpleQuestion(q *question) error {
@@ -154,29 +244,6 @@ func getSimpleQuestion(q *question) error {
 	}
 	*q.Storage = str
 	return nil
-}
-
-func makeBareConfigData(args []string) (*pb.Config, error) {
-	//Make a config object
-	config := new(pb.Config)
-
-	config.Name = string(args[0])
-
-	//Current User
-	err := addHeaderConfig(config)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	//We actually want to add 1 element for input, output and var for example, but we just add blank strings
-	config.Inputs = make([]pb.Input, 1)
-	config.Outputs = make([]pb.Output, 1)
-	config.Vars = make([]pb.Vars, 1)
-
-	config.Code.Block = "	# enclose a block of code in backticks for multi line compatibility"
-	config.Code.Path = "	# full path to the .c file you wish to parse into the block definition on render. If path is blank and no block tries cwd"
-
-	return config, nil
 }
 
 func addHeaderConfig(config *pb.Config) error {

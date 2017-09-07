@@ -35,9 +35,10 @@ type Output struct {
 	Variable
 }
 
-type Vars struct {
+type Var struct {
 	Dtype string `yaml:"dtype"`
 	Name  string `yaml:"name"`
+	Variable
 }
 
 type Code struct {
@@ -51,7 +52,7 @@ type Config struct {
 	Info     string   `yaml:"info"`
 	Inputs   []Input  `yaml:"inputs"`
 	Outputs  []Output `yaml:"outputs"`
-	Vars     []Vars   `yaml:"vars"`
+	Vars     []Var    `yaml:"vars"`
 	Code     Code     `yaml:"code"`
 	Help     string   `yaml:"help"`
 	InternalTemplateData

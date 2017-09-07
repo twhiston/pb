@@ -10,7 +10,7 @@
         <variable socket="out" info="$value" />
     {{ end }}
     {{ range $key, $value := .vars }}
-        <variable dtype="{{ $value }}{{ .type }}" name="{{ $value }}{{ .name }}" />
+        <variable dtype="{{ $value.type }}" name="{{ $value.name }}" />
         //OR IF VALUE ADD value="0"
     {{ end }}
     </data>
