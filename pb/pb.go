@@ -1,5 +1,7 @@
 package pb
 
+import "encoding/xml"
+
 ///////////////////////////////////
 // CONFIG
 ///////////////////////////////////
@@ -50,7 +52,7 @@ type Var struct {
 // however is also possible to use block and paste the code directly in the yaml, backticks should be used to surround the block
 // note that adding code here will not allow you to do render time macro expansion or use the testing framework
 type Code struct {
-	Block string `yaml:"block"`
+	Block string
 	Path  string `yaml:"path"`
 }
 
@@ -75,4 +77,41 @@ type InternalTemplateData struct {
 	DateNow        string
 	BlockNameLower string
 	ParsedFunction []string
+}
+
+type XMLConfig struct {
+	XMLName  xml.Name    `xml:"block"`
+	Name     string      `xml:"name,attr"`
+	Category string      `xml:"category"`
+	Info     string      `xml:"info"`
+	Data     XMLData     `xml:"data"`
+	Function XMLFunction `xml:"function"`
+	Help     XMLHelp     `xml:"help"`
+}
+
+type XMLData struct {
+	XMLName   xml.Name          `xml:"data"`
+	Name      string            `xml:"name,attr"`
+	Variables []XMLDataVariable `xml:"variable"`
+}
+
+type XMLDataVariable struct {
+	XMLName  xml.Name `xml:"variable"`
+	Socket   string   `xml:"socket,attr"`
+	Info     string   `xml:"info,attr"`
+	Editable string   `xml:"editable,attr"`
+	Name     string   `xml:"name,attr"`
+	Value    string   `xml:"value,attr"`
+	Dtype    string   `xml:"dtype,attr"`
+}
+
+type XMLFunction struct {
+	XMLName  xml.Name `xml:"function"`
+	Name     string   `xml:"name,attr"`
+	Function string   `xml:",cdata"`
+}
+
+type XMLHelp struct {
+	XMLName xml.Name `xml:"help"`
+	Help    string   `xml:",cdata"`
 }

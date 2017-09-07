@@ -29,13 +29,10 @@ vars:
     name: {{ $value.Name }}
 {{- end -}}
 {{- end }}
-help: {{ .Help }}
+help: `{{ .Help }}`
 code:
 {{- with .Code }}
 {{- if .Path }}
   path: {{ .Path }}
 {{- end }}
-{{- if .Block }}
-  block: {{ .Block }}
-{{ end -}}
 {{ end }}

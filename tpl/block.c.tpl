@@ -21,8 +21,10 @@
 {{- end -}}
 {{- end }}
  */
-static inline void i{{ len .Inputs }}o{{ len .Outputs }}_{{ .Name }}(i{{ len .Inputs }}o{{ len .Outputs }} *data){
-
+static inline void i{{ len .Inputs }}o{{ len .Outputs }}_{{ .Name }}(i{{ len .Inputs }}o{{ len .Outputs }} *data) {
+    {{ if .Code.Block -}}
+    {{- .Code.Block -}}
+    {{- else -}}
     /* Implement the special sauce here */
-
+    {{- end }}
 }

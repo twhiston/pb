@@ -7,10 +7,11 @@ Patchblocks CLI helper tool for developing new blocks
 
 - Generated readable .yml and .c files to describe and implement blocks with
 - Generate .xml from .yml and .c files
+- Generate .yml and .c files from .xml file
 
 ## Roadmap
 
-- Generate .yml and .c files from .xml file
+- Testing that converts to <-> from all internal blocks to ensure parity
 - Render time expansion of common patchblock operation macros
 - Docker container for testing project golang and C files in CI
 - Test framework

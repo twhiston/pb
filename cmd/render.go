@@ -17,6 +17,7 @@ package cmd
 import (
 	"bufio"
 	"bytes"
+	"encoding/xml"
 	"errors"
 	"github.com/spf13/cobra"
 	"github.com/twhiston/pb/pb"
@@ -159,10 +160,93 @@ func checkExt(ext string) []string {
 	return files
 }
 
+// confCmd represents the conf command
+var confCmd = &cobra.Command{
+	Use:   "conf",
+	Short: "Generate a set of pb conf files from a block xml file",
+	Long:  ``,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		log.Println("conf called")
+
+		confFile, err := cmd.Flags().GetString("xml")
+		if err != nil {
+			return err
+		}
+		if confFile == "" {
+			//If no explicit conf file go looking for one
+			//Because the file is named after the block we cannot predict it, so we just try to find if there is 1 yml in this folder
+			configs := checkExt(".xml")
+			if len(configs) > 1 {
+				return errors.New("More than 1 .xml file in this folder, config is ambiguous, please use the --xml option to specify")
+			}
+			confFile = configs[0]
+		} else {
+			//If we were given a file we should test that it really exists
+			if _, err := os.Stat(confFile); os.IsNotExist(err) {
+				return errors.New("Config file could not be found")
+			}
+		}
+
+		//If we got this far we can try to Unmarshal the config file
+		cfg := new(pb.XMLConfig)
+		dat, err := ioutil.ReadFile(confFile)
+		if err != nil {
+			return err
+		}
+		err = xml.Unmarshal(dat, &cfg)
+		if err != nil {
+			return err
+		}
+
+		// At this point we have our horrible XML structure input, we want to convert it to the output structs and render it
+		// It sucks that we can't do it directly, i guess we could really, but XML and it's associated data structures suck
+		// so we eat the cost of the conversion. As this is not for a 'real time' application it doesn't matter anyway
+		pbConf := new(pb.Config)
+		addHeaderConfig(pbConf)
+		pbConf.Name = cfg.Name
+		pbConf.BlockNameLower = strings.ToLower(pbConf.Name)
+		pbConf.Category = strings.TrimSpace(cfg.Category)
+		pbConf.Info = strings.TrimSpace(cfg.Info)
+		pbConf.Help = strings.TrimSpace(cfg.Help.Help)
+		pbConf.Code.Path = "./" + cfg.Name + ".c"
+
+		//The code block value is only used to send data to the C file render process, it is not used in the yml file
+		pbConf.Code.Block = strings.TrimSpace(cfg.Function.Function)
+
+		//I/O/V data
+		for _, v := range cfg.Data.Variables {
+			if v.Socket == "in" {
+				i := new(pb.Input)
+				i.Info = v.Info
+				i.Editable = v.Editable
+				i.Value = v.Value
+				pbConf.Inputs = append(pbConf.Inputs, *i)
+			} else if v.Socket == "out" {
+				o := new(pb.Output)
+				o.Info = v.Info
+				o.Value = v.Value
+				pbConf.Outputs = append(pbConf.Outputs, *o)
+			} else {
+				//Must be a dtype var
+				vr := new(pb.Var)
+				vr.Value = v.Value
+				vr.Info = v.Info
+				vr.Name = v.Name
+				vr.Dtype = v.Dtype
+				pbConf.Vars = append(pbConf.Vars, *vr)
+			}
+		}
+
+		return doRenderFromConfig(pbConf)
+	},
+}
+
 func init() {
 	RootCmd.AddCommand(renderCmd)
+	renderCmd.AddCommand(confCmd)
 
 	//renderCmd.PersistentFlags().String("dir", "", "A directory to generate a block (or blocks from). Defaults to cwd. If set this overrides conf and c flags")
+	confCmd.Flags().String("xml", "", "XML file to process. If not provided look for single xml in cwd or fails")
 	renderCmd.PersistentFlags().String("cfg", "", "A config yml to generate a block from")
 	//renderCmd.PersistentFlags().String("c", "", "Set the c file that the block will use. Of blank looks for a file called ")
 
