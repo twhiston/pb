@@ -71,7 +71,7 @@ var renderCmd = &cobra.Command{
 		cfg.BlockNameLower = strings.ToLower(cfg.Name)
 
 		if cfg.Code.Block != "" {
-			return errors.New("Block parsing not implemented yet!")
+			return errors.New("Block parsing not implemented yet")
 		}
 		//Parse the .c file
 		if _, err := os.Stat(cfg.Code.Path); os.IsNotExist(err) {
@@ -133,7 +133,7 @@ var renderCmd = &cobra.Command{
 
 		buf := bytes.NewBuffer(*new([]byte))
 
-		renderXmlTemplate(buf, cfg)
+		renderXMLTemplate(buf, cfg)
 		if err != nil {
 			return err
 		}

@@ -66,7 +66,7 @@ func renderCTemplate(wr io.Writer, config *pb.Config) error {
 	return nil
 }
 
-func renderXmlTemplate(wr io.Writer, config *pb.Config) error {
+func renderXMLTemplate(wr io.Writer, config *pb.Config) error {
 	//Load the template, parse and render it
 	filename := config.Name + ".xml"
 	tmpl := template.New(filename) //create a new template
