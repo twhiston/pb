@@ -46,9 +46,22 @@ input = INPUT_TO_INT(input);
 data->out0 = INT_TO_OUTPUT(input);
 ```
 
+### Developing Macros
+
+The macro file is kept in the c/macros folder of the source code, and as well as the macros contains a miniature test framework and test cases
+to ensure the validity of the macros. These macros were developed using [CLion IDE](https://www.jetbrains.com/clion/) and the makefiles should work as is within their build system.
+
+If you wish to contribute macros to the inbuilt library please contribute them to this copy of pb_macro.h and not the one in the assets folder.
+All contributed macros should have an accompanying test in
+c/macros/tests/minunit_config.h
+and the test should be added in the test_list() function at the bottom of the file.
+You should not need to alter any of the other test files.
+
+
 ## Roadmap
 
 - Add more core macros (accepting submissions)
+- Add versioning to release script (inject version info in file)
 - Docker container for testing project golang and C files in CI
 - Add loads more tests of functionality
 - Work out how to decrease reload iteration time
