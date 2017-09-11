@@ -30,7 +30,7 @@ func renderSchemaTemplate(wr io.Writer, config *pb.Config) error {
 	filename := config.Name + ".yml"
 	tmpl := template.New(filename) //create a new template
 
-	data, err := pb.Asset("tpl/schema.yml.tpl")
+	data, err := pb.Asset("assets/tpl/schema.yml.tpl")
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func renderCTemplate(wr io.Writer, config *pb.Config) error {
 	filename := config.Name + ".c"
 	tmpl := template.New(filename) //create a new template
 
-	data, err := pb.Asset("tpl/block.c.tpl")
+	data, err := pb.Asset("assets/tpl/block.c.tpl")
 	if err != nil {
 		return err
 	}
@@ -63,7 +63,7 @@ func renderXMLTemplate(wr io.Writer, config *pb.Config) error {
 	filename := config.Name + ".xml"
 	tmpl := template.New(filename) //create a new template
 
-	data, err := pb.Asset("tpl/block.xml.tpl")
+	data, err := pb.Asset("assets/tpl/block.xml.tpl")
 	if err != nil {
 		return err
 	}

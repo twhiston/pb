@@ -16,7 +16,7 @@ package main
 
 import "github.com/twhiston/pb/cmd"
 
-//go:generate go-bindata -pkg pb -o ./pb/assets.go tpl/
+//go:generate go-bindata -pkg pb -o ./pb/assets.go assets/tpl assets/c
 func main() {
 	cmd.Execute()
 }

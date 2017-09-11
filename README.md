@@ -5,9 +5,10 @@ Patchblocks CLI helper tool for developing new blocks
 
 ## Features
 
-- Generated readable .yml and .c files to describe and implement blocks with
+- Generated readable .yml and .c files to describe and implement blocks
 - Generate .xml from .yml and .c files
 - Generate .yml and .c files from .xml file
+- Render time expansion of common patchblock operation macros
 
 ## Macros
 
@@ -47,9 +48,9 @@ data->out0 = INT_TO_OUTPUT(input);
 
 ## Roadmap
 
-- Render time expansion of common patchblock operation macros
 - Add more core macros (accepting submissions)
 - Docker container for testing project golang and C files in CI
-- Work out how to increase reload iteration time
+- Add loads more tests of functionality
+- Work out how to decrease reload iteration time
 - Test framework
 - Improved simulator debugging options

@@ -5,3 +5,4 @@ test/blocks/orig
 tests/blocks/orig
 tests/blocks/output
 tests/tmp
+c/macros/cmake-build-debug

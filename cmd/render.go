@@ -119,6 +119,17 @@ var renderCmd = &cobra.Command{
 		code = code[:len(code)-1]
 
 		//Merge in the macros
+		internalMacro, err := cmd.PersistentFlags().GetBool("macro-inbuilt")
+
+		if internalMacro {
+			macrofile, err := pb.Asset("assets/c/pb_macro.h")
+			if err != nil {
+				return err
+			}
+			ms := splitByteSliceByLine(macrofile)
+			code = append(ms, code...)
+		}
+
 		macroFilePaths, err := cmd.PersistentFlags().GetStringArray("macro")
 		if err != nil {
 			return err
@@ -152,8 +163,12 @@ func loadMacroFile(filePath string) ([]string, error) {
 	if err != nil {
 		return []string{}, err
 	}
-	lines := strings.Split(string(content), "\n")
+	lines := splitByteSliceByLine(content)
 	return lines, nil
+}
+
+func splitByteSliceByLine(content []byte) []string {
+	return strings.Split(string(content), "\n")
 }
 
 func checkExt(ext string) []string {
