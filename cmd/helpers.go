@@ -38,11 +38,7 @@ func renderSchemaTemplate(wr io.Writer, config *pb.Config) error {
 	if tmpl, err = tmpl.Parse(string(data[:])); err != nil {
 		return err
 	}
-	err = tmpl.Execute(wr, config)
-	if err != nil {
-		return err
-	}
-	return nil
+	return tmpl.Execute(wr, config)
 }
 
 //Render a .c file template from a pb.Config struct
@@ -59,11 +55,7 @@ func renderCTemplate(wr io.Writer, config *pb.Config) error {
 	if tmpl, err = tmpl.Parse(string(data[:])); err != nil {
 		return err
 	}
-	err = tmpl.Execute(wr, config)
-	if err != nil {
-		return err
-	}
-	return nil
+	return tmpl.Execute(wr, config)
 }
 
 func renderXMLTemplate(wr io.Writer, config *pb.Config) error {
@@ -79,26 +71,17 @@ func renderXMLTemplate(wr io.Writer, config *pb.Config) error {
 	if tmpl, err = tmpl.Parse(string(data[:])); err != nil {
 		return err
 	}
-	err = tmpl.Execute(wr, config)
-	if err != nil {
-		return err
-	}
-	return nil
+	return tmpl.Execute(wr, config)
 }
 
-func sanitizeStringInput(i string) string {
-	i = strings.Replace(i, " ", "_", -1)
-	return i
+func SanitiseStringInput(i string) string {
+	return strings.Replace(i, " ", "_", -1)
 }
 
 // getInput takes an id, printed in the user prompt, and asks the user for input
 // It does not allow empty inputs, and will prompt the user again if they fail to enter something valid
 func getInput(id string, def string, r io.Reader) (string, error) {
-	output, err := getInputImpl(id, def, r, 0, 10)
-	if err != nil {
-		return "", err
-	}
-	return output, nil
+	return getInputImpl(id, def, r, 0, 10)
 }
 
 // getInputImpl should not be used directly, call getInput instead

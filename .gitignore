@@ -2,3 +2,6 @@ c/cmake-build-debug
 test/tmp
 test/blocks/output
 test/blocks/orig
+tests/blocks/orig
+tests/blocks/output
+tests/tmp

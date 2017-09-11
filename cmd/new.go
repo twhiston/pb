@@ -135,7 +135,7 @@ func handleInteractiveBuild() error {
 		}
 	}
 	//Sanitize name input
-	config.Name = sanitizeStringInput(config.Name)
+	config.Name = SanitiseStringInput(config.Name)
 
 	// LOOP FOR INPUTS
 	for {
