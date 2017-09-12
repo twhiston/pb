@@ -19,7 +19,7 @@ More to come...
 ## Installation
 
 Download a binary for your platform from the release pages.
-It has been build for MacOsX, Linux x86, Linux //TODO - FIX THIS
+It has been build for OSX (Darwin), Linux x86, Linux amd64 and Windows.
 rename it to `pb` and place it in your path, usually something like `/usr/local/bin`
 
 Windows users - I don't have a windows machine to do a build on or a way to test the cross compiled version.
