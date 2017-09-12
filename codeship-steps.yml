@@ -1,0 +1,3 @@
+- name: test-golang
+  service: pb
+  command: /go/scripts/test.sh

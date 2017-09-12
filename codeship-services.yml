@@ -1,0 +1,6 @@
+# Codeship specific docker compose file
+version: "2"
+
+services:
+  pb:
+    build: .
