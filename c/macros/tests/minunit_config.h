@@ -5,7 +5,7 @@
 #ifndef C_MINUNIT_APP_H
 #define C_MINUNIT_APP_H
 
-#include <printf.h>
+#include <stdio.h>
 #include "minunit.h"
 #include "../pb_macro.h"
 

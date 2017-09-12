@@ -14,6 +14,7 @@ More to come...
 - Generate .xml from .yml and .c files
 - Generate .yml and .c files from .xml file
 - Render time expansion of common patchblock operation macros
+- Docker container for testing project golang and C files in CI
 
 ## Installation
 
@@ -82,10 +83,14 @@ c/macros/tests/minunit_config.h
 and the test should be added in the test_list() function at the bottom of the file.
 You should not need to alter any of the other test files.
 
+## Testing
+Testing is run on codeship and tests both the go command code (and sends coverage) and the C macro code.
+Currently the c macro code is built on the test platform using clang, which is the same as the clion build.
+However in future both these builds will be switched to the same toolchain as the emulator
+
 
 ## Roadmap
 
-- Docker container for testing project golang and C files in CI
 - Add loads more tests of functionality
 - Docs
 - Add more core macros (accepting submissions)
@@ -93,3 +98,4 @@ You should not need to alter any of the other test files.
 - Work out how to decrease reload iteration time
 - Test framework
 - Improved simulator debugging options
+- Improve C container testing to use same gcc build process as the emulator
