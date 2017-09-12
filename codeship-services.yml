@@ -4,3 +4,4 @@ version: "2"
 services:
   pb:
     build: .
+    encrypted_env_file: env.encrypted
