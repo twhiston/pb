@@ -1,3 +1,8 @@
-- name: test-golang
-  service: pb
-  command: /go/scripts/test.sh
+- type: parallel
+  steps:
+    - name: golang
+      service: pb
+      command: /go/src/app/tests/scripts/golang.sh
+    - name: c
+      service: pb
+      command: /go/src/app/tests/scripts/c.sh

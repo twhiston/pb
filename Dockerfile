@@ -6,4 +6,4 @@ MAINTAINER Tom Whiston <tom.whiston@gmail.com>
 RUN apk add --no-cache -U cmake make clang && \
     go get github.com/schrej/godacov && \
     go get -u github.com/haya14busa/goverage
-ENTRYPOINT ["/go/src/app/tests/script.sh"]
+ENTRYPOINT ["/bin/bash"]
