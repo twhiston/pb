@@ -20,10 +20,12 @@ More to come...
 
 Download a binary for your platform from the release pages.
 It has been build for MacOsX, Linux x86, Linux //TODO - FIX THIS
-and place it in your path, usually something like `/usr/local/bin`
+rename it to `pb` and place it in your path, usually something like `/usr/local/bin`
 
-Windows users - I don't have a windows machine to do a build on or a way to test a cross compilation but it should work ok if you compile it yourself.
-If you are a windows user who knows their golang please reach out.
+Windows users - I don't have a windows machine to do a build on or a way to test the cross compiled version.
+If you have problems let me know, but unfortunately I can only offer limited support.
+
+This code was all built and tested in osx, and is tested on codeship using alpine linux.
 
 Alternatively build the code from source
 ```
